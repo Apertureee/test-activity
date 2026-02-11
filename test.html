@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Verification: v1.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #d5f5e3; /* Pastel Green */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            color: #1e5128; /* Dark Green Text */
+            user-select: none;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        h1, h2 {
+            font-weight: 800;
+            margin-top: 0;
+        }
+
+        p {
+            font-weight: 400;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* Fake Terminal */
+        .terminal-box {
+            background: #2d3436;
+            color: #55efc4;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .terminal-line {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Buttons */
+        .btn {
+            background-color: #4e9f3d; /* Fern Green */
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background-color: #2ecc71;
+        }
+
+        canvas {
+            background-color: #333;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+            border: 4px solid #4e9f3d;
+        }
+
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+            max-width: 150px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .d-btn {
+            background: #a8e6cf;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #1e5128;
+        }
+        .d-btn:active { background: #4e9f3d; color: white; }
+
+        /* Hide sections initially */
+        #game1, #game2, #final-page, #success-page { display: none; }
+
+        /* Hidden Next Level Buttons */
+        #snake-next-btn, #bird-next-btn, #snake-retry-btn, #bird-retry-btn {
+            display: none;
+        }
+
+        /* Final Page Specifics */
+        #no-btn {
+            position: absolute;
+            background-color: #b2bec3;
+            transition: 0.1s;
+            z-index: 10;
+        }
+        
+        /* Reaction GIF sizing - FIXED HEIGHT */
+        .reaction-gif {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto 20px auto;
+            height: 200px;       /* Fixed height */
+            object-fit: contain; /* Prevents stretching */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="intro" class="container">
+        <h1>Activity 3 Build v1.0.4 🛠️</h1>
+        
+        <div class="terminal-box">
+            <span class="terminal-line">> Initializing startup sequence...</span>
+            <span class="terminal-line">> Checking compatibility... <span style="color:#fdcb6e">PENDING</span></span>
+            <span class="terminal-line">> Loading modules...</span>
+            <span class="terminal-line">> <span style="color:#ff7675"><b>Alert:</b></span> Security clearance required.</span>
+        </div>
+
+        <p>Snake, Flappy Bird, Test</p>
+        <button class="btn" onclick="startGame1()">Run</button>
+    </div>
+
+    <div id="game1" class="container">
+        <h2>Module 1: Snake 🐍</h2>
+        <p>Score at least <b style="color:#4e9f3d">5</b> to pass.<br>Keep going until you crash!</p>
+        <canvas id="snakeCanvas" width="300" height="300"></canvas>
+        <div class="controls">
+            <div></div><button class="d-btn" onclick="changeDirection('UP')">⬆️</button><div></div>
+            <button class="d-btn" onclick="changeDirection('LEFT')">⬅️</button>
+            <button class="d-btn" onclick="changeDirection('DOWN')">⬇️</button>
+            <button class="d-btn" onclick="changeDirection('RIGHT')">➡️</button>
+        </div>
+        <p id="snake-msg" style="margin-top:10px; font-weight:bold;">Score: 0</p>
+        
+        <button id="snake-retry-btn" class="btn" onclick="resetSnake()">Try Again</button>
+        <button id="snake-next-btn" class="btn" onclick="startGame2()">Next Level >></button>
+    </div>
+
+    <div id="game2" class="container">
+        <h2>Module 2: Flappy Heart 💖</h2>
+        <p>Score at least <b style="color:#4e9f3d">5</b> to pass.<br>Keep flying until you hit a pipe!</p>
+        <canvas id="birdCanvas" width="300" height="400"></canvas>
+        <p id="bird-msg" style="margin-top:10px; font-weight:bold;">Score: 0</p>
+        
+        <button id="bird-retry-btn" class="btn" onclick="resetBird()">Try Again</button>
+        <button id="bird-next-btn" class="btn" onclick="show('final-page')">Next >></button>
+    </div>
+
+    <div id="final-page" class="container" style="justify-content: center; flex-direction: column; align-items: center;">
+        <h1>Test Passed! ✅</h1>
+        
+        <img id="reaction-img" class="reaction-gif" src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXFkaml3dTkxY2ZmejNic2xrZmttb2V2b3J5YWxwYjRmMnptbHY5cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/YLPOIP1jPu1N87yemm/giphy.gif" alt="Reaction">
+        
+        <h2 style="font-size: 1.5rem; margin: 10px 0;">Will you go on a date with me? 🌹</h2>
+        
+        <div style="margin-top: 20px; position:relative; width:100%; height: 80px;">
+            <button class="btn" onclick="showSuccess()" onmouseover="hoverYes()" onmouseout="unhoverYes()">YES! 😍</button>
+            <button id="no-btn" class="btn" onmouseover="moveButton()" onclick="moveButton()">No 😢</button>
+        </div>
+    </div>
+
+    <div id="success-page" class="container">
+        <h1>Success! 💚</h1>
+        <img class="reaction-gif" src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdzV4bmlvZXUwY3k5M2ppeW4yYmJicng5bHBtMXE0MXRkNXhwNWU4NCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TjSPQgowhhJdHgvnwA/giphy.gif" alt="Yay">
+        <p style="font-weight: bold; font-size: 1.2rem;">See you there Marielleee!🩵</p>
+        <p>4:00PM at Maple Grove, Cavite!</p>
+    </div>
+
+    <script>
+        // --- Navigation ---
+        function show(id) {
+            document.querySelectorAll('.container').forEach(div => div.style.display = 'none');
+            const el = document.getElementById(id);
+            el.style.display = (id === 'final-page') ? 'flex' : 'block';
+        }
+
+        /* ===========================
+           GAME 1: SNAKE
+           =========================== */
+        let snakeCanvas = document.getElementById('snakeCanvas');
+        let ctxSnake = snakeCanvas.getContext('2d');
+        let box = 20;
+        let snake = [];
+        let food = {};
+        let d;
+        let gameLoopSnake;
+        let snakeScore = 0;
+
+        function startGame1() {
+            show('game1');
+            resetSnake();
+        }
+
+        function resetSnake() {
+            snake = [{x: 9 * box, y: 10 * box}];
+            food = {
+                x: Math.floor(Math.random() * 15) * box,
+                y: Math.floor(Math.random() * 15) * box
+            };
+            snakeScore = 0;
+            d = null; 
+            clearInterval(gameLoopSnake);
+            gameLoopSnake = setInterval(drawSnakeGame, 150);
+            
+            // Reset UI
+            document.getElementById('snake-msg').innerText = "Score: 0";
+            document.getElementById('snake-msg').style.color = "#1e5128";
+            document.getElementById('snake-retry-btn').style.display = 'none';
+            document.getElementById('snake-next-btn').style.display = 'none';
+        }
+
+        document.addEventListener("keydown", direction);
+        function direction(event) {
+            if(event.keyCode == 37 && d != "RIGHT") d = "LEFT";
+            else if(event.keyCode == 38 && d != "DOWN") d = "UP";
+            else if(event.keyCode == 39 && d != "LEFT") d = "RIGHT";
+            else if(event.keyCode == 40 && d != "UP") d = "DOWN";
+        }
+        function changeDirection(dir) {
+            if (dir === 'LEFT' && d !== 'RIGHT') d = 'LEFT';
+            if (dir === 'UP' && d !== 'DOWN') d = 'UP';
+            if (dir === 'RIGHT' && d !== 'LEFT') d = 'RIGHT';
+            if (dir === 'DOWN' && d !== 'UP') d = 'DOWN';
+        }
+
+        function drawSnakeGame() {
+            ctxSnake.fillStyle = "#2d3436"; 
+            ctxSnake.fillRect(0, 0, 300, 300);
+
+            for(let i = 0; i < snake.length; i++) {
+                ctxSnake.fillStyle = (i == 0) ? "#4e9f3d" : "#2ecc71"; 
+                ctxSnake.fillRect(snake[i].x, snake[i].y, box, box);
+                ctxSnake.strokeStyle = "#2d3436";
+                ctxSnake.strokeRect(snake[i].x, snake[i].y, box, box);
+            }
+
+            ctxSnake.fillStyle = "#ff7675"; 
+            ctxSnake.fillRect(food.x, food.y, box, box);
+
+            let snakeX = snake[0].x;
+            let snakeY = snake[0].y;
+
+            if(d == "LEFT") snakeX -= box;
+            if(d == "UP") snakeY -= box;
+            if(d == "RIGHT") snakeX += box;
+            if(d == "DOWN") snakeY += box;
+
+            if(snakeX == food.x && snakeY == food.y) {
+                snakeScore++;
+                document.getElementById('snake-msg').innerText = `Score: ${snakeScore}`;
+                
+                // Visual Indicator they passed the threshold
+                if(snakeScore >= 5) {
+                    document.getElementById('snake-msg').innerText = `Score: ${snakeScore} (Passed!)`;
+                    document.getElementById('snake-msg').style.color = "#4e9f3d";
+                }
+
+                food = {
+                    x: Math.floor(Math.random() * 15) * box,
+                    y: Math.floor(Math.random() * 15) * box
+                }
+            } else {
+                snake.pop(); 
+            }
+
+            // GAME OVER LOGIC
+            if(snakeX < 0 || snakeX > 280 || snakeY < 0 || snakeY > 280 || collision(snakeX, snakeY, snake)) {
+                clearInterval(gameLoopSnake);
+                
+                if (snakeScore >= 5) {
+                    document.getElementById('snake-msg').innerText = `Crashed! But you passed with ${snakeScore}!`;
+                    document.getElementById('snake-next-btn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('snake-msg').innerText = "Crashed! Need 5 to pass.";
+                    document.getElementById('snake-retry-btn').style.display = 'inline-block';
+                }
+                return;
+            }
+
+            let newHead = {x: snakeX, y: snakeY};
+            snake.unshift(newHead);
+        }
+
+        function collision(headx, heady, array) {
+            for(let i = 0; i < array.length; i++) {
+                if(headx == array[i].x && heady == array[i].y) return true;
+            }
+            return false;
+        }
+
+        /* ===========================
+           GAME 2: FLAPPY BIRD
+           =========================== */
+        let birdCanvas = document.getElementById('birdCanvas');
+        let ctxBird = birdCanvas.getContext('2d');
+        let bird = { x: 50, y: 150, w: 20, h: 20, velocity: 0, gravity: 0.25, jump: -4.5 };
+        let pipes = [];
+        let frame = 0;
+        let birdScore = 0;
+        let gameLoopBird;
+        let isBirdGameRunning = false;
+
+        function startGame2() {
+            show('game2');
+            resetBird();
+        }
+
+        function resetBird() {
+            bird.y = 150;
+            bird.velocity = 0;
+            pipes = [];
+            birdScore = 0;
+            frame = 0;
+            isBirdGameRunning = true;
+            
+            // Reset UI
+            document.getElementById('bird-retry-btn').style.display = 'none';
+            document.getElementById('bird-next-btn').style.display = 'none';
+            document.getElementById('bird-msg').innerText = "Score: 0";
+            document.getElementById('bird-msg').style.color = "#1e5128";
+
+            clearInterval(gameLoopBird);
+            gameLoopBird = setInterval(drawBirdGame, 20);
+        }
+
+        birdCanvas.addEventListener('mousedown', () => { if(isBirdGameRunning) bird.velocity = bird.jump; });
+        birdCanvas.addEventListener('touchstart', (e) => { 
+            e.preventDefault(); 
+            if(isBirdGameRunning) bird.velocity = bird.jump; 
+        });
+
+        function drawBirdGame() {
+            ctxBird.fillStyle = "#c7ecee"; 
+            ctxBird.fillRect(0, 0, 300, 400);
+
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+            ctxBird.fillStyle = "#ff7675"; 
+            ctxBird.fillRect(bird.x, bird.y, bird.w, bird.h);
+
+            if(frame % 110 == 0) { 
+                let gap = 120; 
+                let pipeHeight = Math.floor(Math.random() * (400 - gap - 50)) + 20;
+                pipes.push({ x: 300, y: 0, w: 30, h: pipeHeight, type: 'top' }); 
+                pipes.push({ x: 300, y: pipeHeight + gap, w: 30, h: 400 - pipeHeight - gap, type: 'bottom' }); 
+            }
+
+            for(let i = 0; i < pipes.length; i++) {
+                let p = pipes[i];
+                ctxBird.fillStyle = "#4e9f3d"; 
+                ctxBird.fillRect(p.x, p.y, p.w, p.h);
+                p.x -= 2; 
+
+                if(
+                    bird.x < p.x + p.w &&
+                    bird.x + bird.w > p.x &&
+                    bird.y < p.y + p.h &&
+                    bird.y + bird.h > p.y
+                ) {
+                    gameOverBird();
+                }
+
+                if(p.type === 'top' && p.x + p.w < bird.x && !p.passed) {
+                    birdScore++;
+                    p.passed = true;
+                    document.getElementById('bird-msg').innerText = `Score: ${birdScore}`;
+                    
+                    if(birdScore >= 5) {
+                        document.getElementById('bird-msg').innerText = `Score: ${birdScore} (Passed!)`;
+                        document.getElementById('bird-msg').style.color = "#4e9f3d";
+                    }
+                }
+            }
+            
+            if(pipes.length > 0 && pipes[0].x < -30) pipes.shift();
+
+            if(bird.y + bird.h > 400 || bird.y < 0) {
+                gameOverBird();
+            }
+
+            frame++;
+        }
+
+        function gameOverBird() {
+            isBirdGameRunning = false;
+            clearInterval(gameLoopBird);
+            
+            if (birdScore >= 5) {
+                document.getElementById('bird-msg').innerText = `Hit! But you passed with ${birdScore}!`;
+                document.getElementById('bird-next-btn').style.display = 'inline-block';
+            } else {
+                document.getElementById('bird-msg').innerText = "Hit! Need 5 to pass.";
+                document.getElementById('bird-retry-btn').style.display = 'inline-block';
+            }
+        }
+
+        /* ===========================
+           FINAL PAGE: GIF LOGIC
+           =========================== */
+        let noClickCount = 0;
+        
+        // Array of GIFs to cycle through
+        const sadGifs = [
+            "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMDhrdmF5ZXBveXgxbmxtemRkanZodDF3Zm5qbHgwZ2Y4eGNiMjZpbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wr7oA0rSjnWuiLJOY5/giphy.gif", // 1. Shock/Sad
+            "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmo5d2VweGVzeWN1a3JoMGtneXBoM3BqM3A2dGkwcGg5Zmxrb2ZlcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/y93x7gLXTO5dnSWCEI/giphy.gif", // 2. Crying
+            "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTUwa2l6ZzQ1dmpwanBsYTJvdjZxN3M0N2Q2Nndjd3pmZndyMms1aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/2Dqy9N348V3dl8gSHD/giphy.gif"  // 3. New Sad GIF
+        ];
+
+        function moveButton() {
+            const btn = document.getElementById('no-btn');
+            const img = document.getElementById('reaction-img');
+            
+            // Move relative to its parent container
+            const x = (Math.random() - 0.5) * 200; 
+            const y = (Math.random() - 0.5) * 200;
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+
+            noClickCount++;
+
+            // Cycle through the GIFs (0 -> 1 -> 2 -> 0 -> 1...)
+            // We use modulo (%) to loop the array index
+            const index = (noClickCount - 1) % sadGifs.length;
+            img.src = sadGifs[index];
+        }
+
+        // --- Hover Effects for YES button ---
+        function hoverYes() {
+            document.getElementById('reaction-img').src = "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExaDM3enlsZzdoMno4NzgwZWR4MDd0OGVic3QxbXFxMWJ1ZmY1ajBmbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/In0Lpu4FVivjISX9HT/giphy.gif";
+        }
+
+        function unhoverYes() {
+            document.getElementById('reaction-img').src = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXFkaml3dTkxY2ZmejNic2xrZmttb2V2b3J5YWxwYjRmMnptbHY5cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/YLPOIP1jPu1N87yemm/giphy.gif";
+        }
+
+        function showSuccess() {
+            show('success-page');
+            document.body.style.backgroundColor = '#a8e6cf'; 
+        }
+
+    </script>
+</body>
+</html>
